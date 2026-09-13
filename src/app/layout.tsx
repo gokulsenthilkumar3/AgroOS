@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./modules.css";
 export const metadata: Metadata = { title: "HydroGrow | AgroOS", description: "Secure hydroponic farm operations" };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en"><body>{children}</body></html>; }
