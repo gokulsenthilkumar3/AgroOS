@@ -1,0 +1,14 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "sqlite"; url = env("DATABASE_URL") }
+
+enum AlertStatus { OPEN ACKNOWLEDGED RESOLVED }
+model User { id String @id @default(cuid()); email String @unique; name String; memberships Membership[]; auditEvents AuditEvent[] }
+model Organisation { id String @id @default(cuid()); name String; memberships Membership[]; farms Farm[] }
+model Membership { id String @id @default(cuid()); userId String; organisationId String; role String; user User @relation(fields:[userId], references:[id]); organisation Organisation @relation(fields:[organisationId], references:[id]); @@unique([userId, organisationId]) }
+model Farm { id String @id @default(cuid()); organisationId String; name String; organisation Organisation @relation(fields:[organisationId], references:[id]); zones Zone[] }
+model Zone { id String @id @default(cuid()); farmId String; name String; cropBatch CropBatch?; devices Device[]; farm Farm @relation(fields:[farmId], references:[id]) }
+model CropBatch { id String @id @default(cuid()); zoneId String @unique; crop String; plantedAt DateTime; expectedHarvest DateTime; zone Zone @relation(fields:[zoneId], references:[id]) }
+model Device { id String @id @default(cuid()); zoneId String; name String; status String; zone Zone @relation(fields:[zoneId], references:[id]); readings TelemetryReading[]; alerts Alert[] }
+model TelemetryReading { id String @id @default(cuid()); deviceId String; recordedAt DateTime; temperature Float; humidity Float; ph Float; ec Float; waterLevel Float; device Device @relation(fields:[deviceId], references:[id]); @@index([deviceId,recordedAt]) }
+model Alert { id String @id @default(cuid()); deviceId String; title String; detail String; severity String; status AlertStatus @default(OPEN); createdAt DateTime @default(now()); acknowledgedAt DateTime?; resolvedAt DateTime?; device Device @relation(fields:[deviceId], references:[id]) }
+model AuditEvent { id String @id @default(cuid()); userId String; action String; entityType String; entityId String; occurredAt DateTime @default(now()); metadata String; user User @relation(fields:[userId], references:[id]) }
