@@ -1,4 +1,4 @@
-export type FarmType = "Hydroponics" | "Coconut" | "Goat dairy" | "Poultry" | "Mixed farm";
+export type FarmType = "Hydroponics" | "Coconut" | "Goat dairy" | "Poultry" | "Mixed farm" | "Bee apiary" | "Flower farm" | "Leafy greens" | "Greenhouse" | "Orchard" | "Aquaculture";
 export type ManagedFarm = { id: string; name: string; type: FarmType; location: string; area: string; status: "Active" | "Planning"; updatedAt: string };
 export const managedFarms: ManagedFarm[] = [
   { id: "farm-green-valley", name: "Green Valley Hydroponics", type: "Hydroponics", location: "Pune, Maharashtra", area: "1.8 acres", status: "Active", updatedAt: "Today" },

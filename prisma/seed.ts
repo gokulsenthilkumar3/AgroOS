@@ -1,15 +1,13 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { PrismaClient, Role, UnitCategory } from "@prisma/client";
+const db = new PrismaClient();
 async function main() {
-  const organisation = await prisma.organisation.upsert({ where: { id: "org-hydrogrow" }, update: {}, create: { id: "org-hydrogrow", name: "Green Valley Hydroponics" } });
-  const user = await prisma.user.upsert({ where: { email: "anika@hydrogrow.demo" }, update: {}, create: { id: "user-demo", email: "anika@hydrogrow.demo", name: "Anika Sharma" } });
-  await prisma.membership.upsert({ where: { userId_organisationId: { userId: user.id, organisationId: organisation.id } }, update: {}, create: { userId: user.id, organisationId: organisation.id, role: "FARM_MANAGER" } });
-  const farm = await prisma.farm.upsert({ where: { id: "farm-green-valley" }, update: {}, create: { id: "farm-green-valley", name: "Green Valley Hydroponics", organisationId: organisation.id } });
-  const zone = await prisma.zone.upsert({ where: { id: "zone-leafy-a" }, update: {}, create: { id: "zone-leafy-a", name: "Leafy Greens A", farmId: farm.id } });
-  await prisma.cropBatch.upsert({ where: { zoneId: zone.id }, update: {}, create: { zoneId: zone.id, crop: "Butterhead lettuce", plantedAt: new Date("2026-08-01"), expectedHarvest: new Date("2026-09-18") } });
-  const device = await prisma.device.upsert({ where: { id: "dev-a" }, update: {}, create: { id: "dev-a", name: "Nutrient Station A", zoneId: zone.id, status: "Online" } });
-  const exists = await prisma.telemetryReading.count({ where: { deviceId: device.id } });
-  if (!exists) await prisma.telemetryReading.createMany({ data: Array.from({ length: 24 }, (_, hour) => ({ deviceId: device.id, recordedAt: new Date(Date.now() - (23 - hour) * 3600000), temperature: 22.4 + Math.sin(hour / 3) * 1.6, humidity: 68, ph: 5.4, ec: 2.05 + Math.sin(hour / 4) * .18, waterLevel: 78 })) });
-  console.log("Demo tenant seeded.");
+  const organisation = await db.organisation.upsert({ where:{slug:"green-valley"}, update:{}, create:{name:"Green Valley Collective",slug:"green-valley"} });
+  const manager = await db.user.upsert({ where:{email:"anika@hydrogrow.demo"}, update:{}, create:{clerkId:"demo_anika",email:"anika@hydrogrow.demo",name:"Anika Sharma"} });
+  await db.membership.upsert({ where:{userId_organisationId:{userId:manager.id,organisationId:organisation.id}}, update:{role:Role.MANAGER}, create:{userId:manager.id,organisationId:organisation.id,role:Role.MANAGER} });
+  const farm = await db.farm.create({ data:{organisationId:organisation.id,name:"Sahyadri Integrated Farm",type:"Mixed farm",location:"Pune, Maharashtra",areaValue:12,areaUnit:"acre"} });
+  const templates = [{name:"Dairy herd",category:UnitCategory.DAIRY,key:"cattle"},{name:"Free-range poultry",category:UnitCategory.POULTRY,key:"poultry"},{name:"Coconut grove",category:UnitCategory.CROP,key:"horticulture"},{name:"Greenhouse A",category:UnitCategory.GREENHOUSE,key:"protected"},{name:"Honey apiary",category:UnitCategory.APICULTURE,key:"apiary"},{name:"Fish pond 1",category:UnitCategory.AQUACULTURE,key:"aquaculture"}];
+  for (const item of templates) await db.productionUnit.create({data:{farmId:farm.id,name:item.name,category:item.category,templateKey:item.key,attributes:{seeded:true}}});
+  await db.product.createMany({data:[{organisationId:organisation.id,name:"A2 farm milk",category:"Dairy",price:78,stock:240,unit:"L"},{organisationId:organisation.id,name:"Raw forest honey",category:"Apiary",price:420,stock:32,unit:"500g"},{organisationId:organisation.id,name:"Free-range eggs",category:"Poultry",price:210,stock:1248,unit:"dozen"}]});
+  console.log("AgroOS production fixtures seeded.");
 }
-main().finally(() => prisma.$disconnect());
+main().finally(()=>db.$disconnect());

@@ -1,7 +1,7 @@
 "use client";
 import { FormEvent, useState, useTransition } from "react";
 import type { ManagedFarm, FarmType } from "@/lib/farms";
-const types: FarmType[] = ["Hydroponics", "Coconut", "Goat dairy", "Poultry", "Mixed farm"];
+const types: FarmType[] = ["Hydroponics", "Coconut", "Goat dairy", "Poultry", "Mixed farm", "Bee apiary", "Flower farm", "Leafy greens", "Greenhouse", "Orchard", "Aquaculture"];
 const csrf = () => document.cookie.split("; ").find(v => v.startsWith("agroos_csrf="))?.split("=")[1] ?? "";
 export function FarmRegistry({ initialFarms, canManage }: { initialFarms: ManagedFarm[]; canManage: boolean }) {
   const [farms, setFarms] = useState(initialFarms); const [editing, setEditing] = useState<ManagedFarm | null>(null); const [open, setOpen] = useState(false); const [message, setMessage] = useState(""); const [pending, startTransition] = useTransition();

@@ -1,14 +1,319 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "sqlite"; url = env("DATABASE_URL") }
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
 
-enum AlertStatus { OPEN ACKNOWLEDGED RESOLVED }
-model User { id String @id @default(cuid()); email String @unique; name String; memberships Membership[]; auditEvents AuditEvent[] }
-model Organisation { id String @id @default(cuid()); name String; memberships Membership[]; farms Farm[] }
-model Membership { id String @id @default(cuid()); userId String; organisationId String; role String; user User @relation(fields:[userId], references:[id]); organisation Organisation @relation(fields:[organisationId], references:[id]); @@unique([userId, organisationId]) }
-model Farm { id String @id @default(cuid()); organisationId String; name String; organisation Organisation @relation(fields:[organisationId], references:[id]); zones Zone[] }
-model Zone { id String @id @default(cuid()); farmId String; name String; cropBatch CropBatch?; devices Device[]; farm Farm @relation(fields:[farmId], references:[id]) }
-model CropBatch { id String @id @default(cuid()); zoneId String @unique; crop String; plantedAt DateTime; expectedHarvest DateTime; zone Zone @relation(fields:[zoneId], references:[id]) }
-model Device { id String @id @default(cuid()); zoneId String; name String; status String; zone Zone @relation(fields:[zoneId], references:[id]); readings TelemetryReading[]; alerts Alert[] }
-model TelemetryReading { id String @id @default(cuid()); deviceId String; recordedAt DateTime; temperature Float; humidity Float; ph Float; ec Float; waterLevel Float; device Device @relation(fields:[deviceId], references:[id]); @@index([deviceId,recordedAt]) }
-model Alert { id String @id @default(cuid()); deviceId String; title String; detail String; severity String; status AlertStatus @default(OPEN); createdAt DateTime @default(now()); acknowledgedAt DateTime?; resolvedAt DateTime?; device Device @relation(fields:[deviceId], references:[id]) }
-model AuditEvent { id String @id @default(cuid()); userId String; action String; entityType String; entityId String; occurredAt DateTime @default(now()); metadata String; user User @relation(fields:[userId], references:[id]) }
+enum Role {
+  PLATFORM_ADMIN
+  SUPPORT_AGENT
+  OWNER
+  MANAGER
+  SPECIALIST
+  OPERATOR
+  ACCOUNTANT
+  CUSTOMER
+  VIEWER
+}
+enum MembershipStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+  REVOKED
+}
+enum UnitCategory {
+  LIVESTOCK
+  DAIRY
+  POULTRY
+  CROP
+  GREENHOUSE
+  APICULTURE
+  SERICULTURE
+  VERMICULTURE
+  AQUACULTURE
+  HYDROPONICS
+  STORAGE
+}
+enum CycleStatus {
+  PLANNED
+  ACTIVE
+  HARVESTED
+  COMPLETED
+  CANCELLED
+}
+enum OrderStatus {
+  DRAFT
+  PENDING_PAYMENT
+  CONFIRMED
+  PACKED
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+enum NewsStatus {
+  IMPORTED
+  IN_REVIEW
+  APPROVED
+  PUBLISHED
+  REJECTED
+}
+enum PredictionStatus {
+  ACTIVE
+  OVERRIDDEN
+  DISABLED
+  EXPIRED
+}
+
+model User {
+  id String @id @default(cuid())
+  clerkId String @unique
+  email String @unique
+  name String
+  avatarUrl String?
+  memberships Membership[]
+  auditEvents AuditEvent[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Organisation {
+  id String @id @default(cuid())
+  clerkOrgId String? @unique
+  name String
+  slug String @unique
+  status String @default("active")
+  memberships Membership[]
+  farms Farm[]
+  products Product[]
+  orders Order[]
+  news NewsItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
+model Membership {
+  id String @id @default(cuid())
+  userId String
+  organisationId String
+  role Role
+  status MembershipStatus @default(ACTIVE)
+  user User @relation(fields:[userId], references:[id])
+  organisation Organisation @relation(fields:[organisationId], references:[id])
+  @@unique([userId, organisationId])
+  @@index([organisationId, status])
+}
+model Farm {
+  id String @id @default(cuid())
+  organisationId String
+  name String
+  type String
+  location String?
+  areaValue Decimal?
+  areaUnit String?
+  status String @default("active")
+  version Int @default(1)
+  organisation Organisation @relation(fields:[organisationId], references:[id])
+  units ProductionUnit[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  @@index([organisationId, status])
+}
+model ProductionUnit {
+  id String @id @default(cuid())
+  farmId String
+  name String
+  category UnitCategory
+  templateKey String
+  attributes Json
+  status String @default("active")
+  version Int @default(1)
+  farm Farm @relation(fields:[farmId], references:[id])
+  cycles ProductionCycle[]
+  subjects Subject[]
+  telemetry TelemetryReading[]
+  @@index([farmId, category, status])
+}
+model Subject {
+  id String @id @default(cuid())
+  unitId String
+  externalTag String?
+  kind String
+  name String?
+  breedOrVariety String?
+  attributes Json
+  status String @default("active")
+  unit ProductionUnit @relation(fields:[unitId], references:[id])
+  healthEvents HealthEvent[]
+  @@index([unitId, kind, status])
+}
+model ProductionCycle {
+  id String @id @default(cuid())
+  unitId String
+  name String
+  speciesOrCrop String
+  startedAt DateTime
+  expectedEndAt DateTime?
+  status CycleStatus @default(ACTIVE)
+  attributes Json
+  unit ProductionUnit @relation(fields:[unitId], references:[id])
+  activities Activity[]
+  production ProductionRecord[]
+  @@index([unitId, status, startedAt])
+}
+model Activity {
+  id String @id @default(cuid())
+  cycleId String
+  type String
+  title String
+  dueAt DateTime?
+  completedAt DateTime?
+  values Json
+  cycle ProductionCycle @relation(fields:[cycleId], references:[id])
+  @@index([cycleId, dueAt])
+}
+model HealthEvent {
+  id String @id @default(cuid())
+  subjectId String
+  type String
+  occurredAt DateTime
+  notes String?
+  values Json
+  subject Subject @relation(fields:[subjectId], references:[id])
+  @@index([subjectId, occurredAt])
+}
+model ProductionRecord {
+  id String @id @default(cuid())
+  cycleId String
+  productType String
+  quantity Decimal
+  unit String
+  recordedAt DateTime
+  quality Json?
+  cycle ProductionCycle @relation(fields:[cycleId], references:[id])
+  @@index([cycleId, recordedAt])
+}
+model TelemetryReading {
+  id BigInt @id @default(autoincrement())
+  unitId String
+  metric String
+  value Float
+  unitLabel String
+  recordedAt DateTime
+  metadata Json?
+  unit ProductionUnit @relation(fields:[unitId], references:[id])
+  @@index([unitId, metric, recordedAt])
+}
+model Product {
+  id String @id @default(cuid())
+  organisationId String
+  name String
+  category String
+  price Decimal
+  currency String @default("INR")
+  stock Decimal
+  unit String
+  active Boolean @default(true)
+  organisation Organisation @relation(fields:[organisationId], references:[id])
+  orderLines OrderLine[]
+  @@index([organisationId, active, category])
+}
+model Order {
+  id String @id @default(cuid())
+  organisationId String
+  customerId String
+  status OrderStatus @default(PENDING_PAYMENT)
+  total Decimal
+  currency String @default("INR")
+  organisation Organisation @relation(fields:[organisationId], references:[id])
+  lines OrderLine[]
+  createdAt DateTime @default(now())
+  @@index([organisationId, status, createdAt])
+}
+model OrderLine {
+  id String @id @default(cuid())
+  orderId String
+  productId String
+  quantity Decimal
+  unitPrice Decimal
+  order Order @relation(fields:[orderId], references:[id])
+  product Product @relation(fields:[productId], references:[id])
+}
+model StorageReservation {
+  id String @id @default(cuid())
+  organisationId String
+  customerId String
+  facilityId String
+  commodity String
+  quantity Decimal
+  unit String
+  startsAt DateTime
+  endsAt DateTime
+  status String
+  version Int @default(1)
+  @@index([organisationId, facilityId, startsAt, endsAt])
+}
+model NewsItem {
+  id String @id @default(cuid())
+  organisationId String?
+  title String
+  summary String
+  sourceName String
+  sourceUrl String
+  region String?
+  commodity String?
+  language String @default("en")
+  status NewsStatus @default(IMPORTED)
+  publishedAt DateTime?
+  organisation Organisation? @relation(fields:[organisationId], references:[id])
+  @@index([status, region, publishedAt])
+}
+model Prediction {
+  id String @id @default(cuid())
+  organisationId String
+  targetType String
+  targetId String
+  kind String
+  score Float
+  confidence Float
+  explanation Json
+  modelKey String
+  modelVersion String
+  status PredictionStatus @default(ACTIVE)
+  generatedAt DateTime @default(now())
+  expiresAt DateTime?
+  @@index([organisationId, kind, generatedAt])
+}
+model AuditEvent {
+  id String @id @default(cuid())
+  userId String?
+  organisationId String?
+  action String
+  entityType String
+  entityId String
+  metadata Json
+  occurredAt DateTime @default(now())
+  user User? @relation(fields:[userId], references:[id])
+  @@index([organisationId, occurredAt])
+}
+model WebhookEvent {
+  id String @id
+  provider String
+  type String
+  payloadHash String
+  processedAt DateTime?
+  receivedAt DateTime @default(now())
+  @@index([provider, receivedAt])
+}
+model OutboxEvent {
+  id String @id @default(cuid())
+  topic String
+  aggregateId String
+  payload Json
+  createdAt DateTime @default(now())
+  processedAt DateTime?
+  attempts Int @default(0)
+  @@index([processedAt, createdAt])
+}

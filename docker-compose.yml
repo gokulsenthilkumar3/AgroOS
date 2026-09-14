@@ -1,0 +1,18 @@
+services:
+  database:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_USER: agroos
+      POSTGRES_PASSWORD: agroos
+      POSTGRES_DB: agroos
+    ports:
+      - "5432:5432"
+    volumes:
+      - agroos_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agroos"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  agroos_postgres:

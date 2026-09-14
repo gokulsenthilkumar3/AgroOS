@@ -37,18 +37,16 @@ Agricultural data, post-harvest logistics, procurement, and customer sales are c
 - [System design](docs/SYSTEM_DESIGN.md)
 - [Technology stack](docs/TECH_STACK.md)
 
-## HydroGrow MVP: local setup
+## AgroOS production-platform setup
 
-The current implementation is a Next.js/TypeScript HydroGrow dashboard with secure demo sessions, SQLite/Prisma data modelling, tenant-scoped APIs, and alert workflows.
+The current implementation is a Next.js/TypeScript multi-user agriculture platform with Clerk integration, PostgreSQL/TimescaleDB modelling, tenant-scoped RBAC, configurable farming templates, admin operations, customer commerce, analytics, and explainable advisory rules.
 
 1. Install Node.js LTS and pnpm.
-2. Copy `.env.example` to `.env`, and replace `SESSION_SECRET` before any shared deployment.
+2. Copy `.env.example` to `.env`, configure Clerk keys, and replace `SESSION_SECRET` before any shared deployment.
 3. Install packages with `pnpm install`.
-4. Create the local database with `pnpm prisma migrate dev --name init`, then seed it with `pnpm db:seed`.
-5. Run `pnpm dev` and open `http://localhost:3000`. Select **Enter demo farm** to use the seeded Farm Manager session.
-
-This is evaluation authentication only; production must replace it with a proper identity provider.
+4. Start TimescaleDB with `docker compose up -d`, create the schema with `pnpm prisma migrate dev --name production_foundation`, then seed it with `pnpm db:seed`.
+5. Run `pnpm dev` and open `http://localhost:3000`. When Clerk keys are absent, local demo accounts remain available for evaluation.
 
 ## Deployment and safety
 
-The application is Vercel-ready. Set `DATABASE_URL`, `SESSION_SECRET`, and `NEXT_PUBLIC_APP_URL` in the deployment environment; use a managed PostgreSQL database before production. The app applies tenant checks, HTTP-only session cookies, CSRF/origin checks on alert mutations, input validation, restrictive security headers, and audit-style mutation logs. Do not commit `.env` files or production credentials.
+The application is Vercel-ready. Set all required database, Clerk, payment, and integration secrets in the deployment environment. AgroOS keeps domain roles in PostgreSQL, verifies Clerk webhooks, applies tenant checks, validates mutations, sends restrictive security headers, and models immutable audit/outbox events. Do not commit `.env` files or production credentials.

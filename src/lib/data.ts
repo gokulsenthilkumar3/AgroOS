@@ -1,6 +1,7 @@
 export type AlertStatus = "OPEN" | "ACKNOWLEDGED" | "RESOLVED";
 export type Alert = { id: string; title: string; detail: string; severity: "critical" | "warning"; status: AlertStatus; device: string; zone: string; createdAt: string; acknowledgedAt?: string; resolvedAt?: string };
 export const user = { id: "user-demo", name: "Anika Sharma", email: "anika@hydrogrow.demo", organisationId: "org-hydrogrow", role: "FARM_MANAGER" };
+export const customer = { id: "customer-demo", name: "Riya Kapoor", email: "riya@agroos.demo", organisationId: "org-hydrogrow", role: "CUSTOMER" };
 export const farm = { name: "Green Valley Hydroponics", location: "Pune, Maharashtra", zones: 3 };
 export const devices = [
   { id: "dev-a", name: "Nutrient Station A", zone: "Leafy Greens A", status: "Online", temperature: 24.1, humidity: 68, ph: 5.4, ec: 2.6, waterLevel: 78 },
@@ -36,4 +37,17 @@ export const integratedFarm = [
   { type: "Coconut grove", unit: "Trees", count: "184", metric: "86% harvest-ready", detail: "Next harvest window: 22 Sep", tone: "healthy" },
   { type: "Goat herd", unit: "Animals", count: "47", metric: "44 healthy checks", detail: "3 vaccination reminders", tone: "warning" },
   { type: "Dairy", unit: "Today’s yield", count: "286 L", metric: "96% quality pass", detail: "2 collection runs scheduled", tone: "healthy" }
+];
+export const farmTypes = ["Hydroponics", "Coconut", "Goat dairy", "Poultry", "Mixed farm", "Bee apiary", "Flower farm", "Leafy greens", "Greenhouse", "Orchard", "Aquaculture"] as const;
+export const farmPortfolio = [
+  { name: "Honey & pollination", value: "18", label: "active hives", trend: "+2 this month", tone: "healthy" },
+  { name: "Flower blocks", value: "0.9 ac", label: "marigold & rose", trend: "Harvest in 6 days", tone: "healthy" },
+  { name: "Greenhouse", value: "4", label: "climate zones", trend: "All climate targets met", tone: "healthy" },
+  { name: "Leafy greens", value: "1,840", label: "plants growing", trend: "96% healthy", tone: "healthy" }
+];
+export const news = [
+  { category: "Market", title: "Pune wholesale vegetable prices show steady demand", source: "AgroOS market brief", time: "2h ago" },
+  { category: "Weather", title: "Plan protected cultivation around the coming rainfall window", source: "Farm advisory", time: "4h ago" },
+  { category: "Practice", title: "Five pollinator-friendly planting practices for flower farms", source: "AgroOS learning", time: "Yesterday" },
+  { category: "Dairy", title: "Cold-chain checklist for morning milk collection", source: "Operations guide", time: "Yesterday" }
 ];

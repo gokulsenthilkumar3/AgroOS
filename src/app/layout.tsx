@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import "./modules.css";
-export const metadata: Metadata = { title: "HydroGrow | AgroOS", description: "Secure hydroponic farm operations" };
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en"><body>{children}</body></html>; }
+export const metadata: Metadata = { title: "AgroOS", description: "The operating system for modern agriculture" };
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const document = <html lang="en"><body>{children}</body></html>;
+  return process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? <ClerkProvider>{document}</ClerkProvider> : document;
+}
