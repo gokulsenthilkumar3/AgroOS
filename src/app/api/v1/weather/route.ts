@@ -1,0 +1,2 @@
+import { NextResponse } from "next/server";import { requireSession } from "@/lib/auth";import { apiError,correlationId } from "@/lib/api";import { weather } from "@/lib/data";
+export async function GET(){try{const user=await requireSession();return NextResponse.json({data:weather,meta:{organisationId:user.organisationId,source:"curated-demo",live:false},requestId:correlationId()},{headers:{"Cache-Control":"private, max-age=60"}})}catch{return apiError(401,"UNAUTHENTICATED","Sign in is required.")}}

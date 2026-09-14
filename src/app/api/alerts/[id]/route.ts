@@ -4,6 +4,7 @@ import { alerts } from "@/lib/data";
 import { CSRF_COOKIE, isOriginAllowed, requireSession } from "@/lib/auth";
 import { apiError, correlationId } from "@/lib/api";
 import { allowRequest } from "@/lib/rate-limit";
+import { can, type Role } from "@/lib/roles";
 const payload = z.object({ action: z.enum(["acknowledge", "resolve"]), note: z.string().trim().max(500).optional() });
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const requestId = correlationId();
@@ -11,7 +12,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     const session = await requireSession();
     const client = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
     if (!allowRequest(`${session.id}:${client}`)) return apiError(429, "RATE_LIMITED", "Too many alert updates. Try again shortly.");
-    if (session.role !== "FARM_MANAGER") return apiError(403, "FORBIDDEN", "You do not have permission to update alerts.");
+    if (!can(session.role as Role, "farm:write")) return apiError(403, "FORBIDDEN", "Your role cannot update alerts.");
     if (!isOriginAllowed(request)) return apiError(403, "ORIGIN_REJECTED", "Request origin was rejected.");
     const csrfHeader = request.headers.get("x-csrf-token"); const csrfCookie = request.headers.get("cookie")?.match(/agroos_csrf=([^;]+)/)?.[1];
     if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) return apiError(403, "CSRF_REJECTED", "Request verification failed.");

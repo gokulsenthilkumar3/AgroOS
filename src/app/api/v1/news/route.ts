@@ -1,0 +1,2 @@
+import { NextResponse } from "next/server";import { requireSession } from "@/lib/auth";import { apiError,correlationId } from "@/lib/api";import { news } from "@/lib/data";
+export async function GET(r:Request){try{await requireSession();const limit=Math.min(Number(new URL(r.url).searchParams.get("limit")??10),50);return NextResponse.json({data:news.slice(0,limit),meta:{moderated:true,live:false},requestId:correlationId()},{headers:{"Cache-Control":"private, max-age=120"}})}catch{return apiError(401,"UNAUTHENTICATED","Sign in is required.")}}

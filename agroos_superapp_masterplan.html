@@ -1,0 +1,562 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#1a7a3c;--green-light:#e8f5ed;--green-mid:#4caf71;--gold:#c8891a;--gold-light:#fdf3e1;--earth:#6b4f2a;--sky:#1565c0;--sky-light:#e3f0fc}
+body{font-family:var(--font-sans,"anthropic-sans",sans-serif)}
+
+.hero{padding:2rem 0 1.5rem;border-bottom:0.5px solid var(--border)}
+.hero-eyebrow{font-size:11px;letter-spacing:.12em;color:var(--text-muted);text-transform:none;margin-bottom:.5rem}
+.hero-title{font-size:2.4rem;font-weight:500;line-height:1.1;color:var(--text-primary);margin-bottom:.75rem}
+.hero-sub{font-size:15px;color:var(--text-secondary);line-height:1.6;max-width:560px;margin-bottom:1.25rem}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:0.5px solid}
+.badge-green{background:var(--bg-success);color:var(--text-success);border-color:var(--border-success)}
+.badge-amber{background:var(--bg-warning);color:var(--text-warning);border-color:var(--border-warning)}
+.badge-blue{background:var(--bg-accent);color:var(--text-accent);border-color:var(--border-accent)}
+
+.nav{display:flex;gap:4px;padding:1rem 0;border-bottom:0.5px solid var(--border);flex-wrap:wrap}
+.nav-btn{font-size:12px;padding:6px 12px;border-radius:20px;border:0.5px solid var(--border);background:transparent;color:var(--text-secondary);cursor:pointer;transition:all .15s;white-space:nowrap}
+.nav-btn:hover{background:var(--surface-1);color:var(--text-primary)}
+.nav-btn.active{background:var(--text-primary);color:var(--surface-2);border-color:var(--text-primary)}
+
+.section{display:none;padding:1.5rem 0}
+.section.active{display:block}
+
+.section-header{margin-bottom:1.25rem}
+.section-title{font-size:1.2rem;font-weight:500;color:var(--text-primary);margin-bottom:.35rem}
+.section-desc{font-size:13px;color:var(--text-secondary);line-height:1.6}
+
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.module-card{background:var(--surface-1);border:0.5px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all .18s}
+.module-card:hover{border-color:var(--border-strong);background:var(--surface-2)}
+.module-card.featured{border-color:var(--border-accent);background:var(--bg-accent)}
+.module-icon{font-size:22px;margin-bottom:.5rem;display:block}
+.module-name{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:.25rem}
+.module-desc{font-size:11px;color:var(--text-secondary);line-height:1.5}
+.module-count{font-size:10px;color:var(--text-muted);margin-top:.4rem}
+
+.arch-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.arch-card{background:var(--surface-1);border:0.5px solid var(--border);border-radius:12px;padding:1rem}
+.arch-card h4{font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:.5rem}
+.arch-item{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:0.5px solid var(--border);font-size:11px;color:var(--text-secondary)}
+.arch-item:last-child{border-bottom:none}
+.arch-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--text-success)}
+.dot-blue{background:var(--text-accent)}
+.dot-amber{background:var(--text-warning)}
+.dot-red{background:var(--text-danger)}
+
+.roadmap{display:flex;flex-direction:column;gap:0}
+.phase{display:flex;gap:1rem;padding:1rem 0;border-bottom:0.5px solid var(--border)}
+.phase:last-child{border-bottom:none}
+.phase-left{flex-shrink:0;width:80px}
+.phase-tag{font-size:10px;font-weight:500;padding:3px 8px;border-radius:4px;text-align:center;margin-bottom:.3rem}
+.phase-duration{font-size:10px;color:var(--text-muted);text-align:center}
+.phase-content h4{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:.3rem}
+.phase-content p{font-size:11px;color:var(--text-secondary);line-height:1.6;margin-bottom:.4rem}
+.phase-pills{display:flex;flex-wrap:wrap;gap:4px}
+.phase-pill{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--surface-0);border:0.5px solid var(--border);color:var(--text-muted)}
+
+.ui-preview{background:var(--surface-1);border:0.5px solid var(--border);border-radius:12px;overflow:hidden}
+.ui-topbar{background:var(--surface-2);border-bottom:0.5px solid var(--border);padding:.6rem 1rem;display:flex;align-items:center;gap:10px}
+.ui-dots{display:flex;gap:5px}
+.ui-dot{width:8px;height:8px;border-radius:50%}
+.ui-title{font-size:11px;color:var(--text-muted);margin:0 auto}
+.ui-body{display:flex;height:300px}
+.ui-sidebar{width:140px;background:var(--surface-1);border-right:0.5px solid var(--border);padding:.75rem .5rem;flex-shrink:0}
+.ui-nav-item{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:6px;font-size:10px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px}
+.ui-nav-item.active{background:var(--bg-success);color:var(--text-success);font-weight:500}
+.ui-nav-item i{font-size:13px}
+.ui-main{flex:1;padding:.75rem;overflow:hidden}
+.ui-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:.6rem}
+.ui-kpi{background:var(--surface-2);border:0.5px solid var(--border);border-radius:8px;padding:.5rem .6rem}
+.ui-kpi-val{font-size:16px;font-weight:500;color:var(--text-primary)}
+.ui-kpi-lab{font-size:9px;color:var(--text-muted);margin-top:1px}
+.ui-kpi-chg{font-size:9px;color:var(--text-success)}
+.ui-chart-area{background:var(--surface-2);border:0.5px solid var(--border);border-radius:8px;padding:.5rem;height:120px;position:relative;overflow:hidden}
+.ui-chart-label{font-size:9px;color:var(--text-muted);margin-bottom:4px}
+.chart-bars{display:flex;align-items:flex-end;gap:3px;height:88px}
+.chart-bar{flex:1;border-radius:2px 2px 0 0;min-height:4px}
+.ui-alerts{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:.5rem}
+.ui-alert{background:var(--surface-2);border:0.5px solid var(--border);border-radius:6px;padding:.35rem .5rem;font-size:9px}
+.ui-alert-title{font-weight:500;color:var(--text-primary);margin-bottom:1px}
+.ui-alert-body{color:var(--text-muted)}
+
+.stack-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:.75rem}
+.stack-pill{font-size:11px;padding:4px 10px;border-radius:6px;border:0.5px solid var(--border);background:var(--surface-1);color:var(--text-secondary)}
+.stack-section{margin-bottom:1rem}
+.stack-section h4{font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:.4rem;text-transform:none;letter-spacing:.04em}
+
+.revenue-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:.75rem}
+.revenue-card{background:var(--surface-1);border:0.5px solid var(--border);border-radius:12px;padding:1rem}
+.revenue-card h4{font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:.25rem}
+.revenue-card .amount{font-size:22px;font-weight:500;color:var(--text-primary)}
+.revenue-card .label{font-size:11px;color:var(--text-muted)}
+.revenue-streams{margin-top:.5rem}
+.rev-stream{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:0.5px solid var(--border);font-size:11px}
+.rev-stream:last-child{border-bottom:none}
+.rev-name{color:var(--text-secondary)}
+.rev-val{color:var(--text-primary);font-weight:500}
+
+.metric-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:.75rem}
+.metric-table th{text-align:left;font-weight:500;color:var(--text-muted);font-size:10px;padding:.4rem .5rem;border-bottom:0.5px solid var(--border)}
+.metric-table td{padding:.5rem .5rem;border-bottom:0.5px solid var(--border);color:var(--text-secondary)}
+.metric-table td:first-child{color:var(--text-primary);font-weight:500}
+.metric-table tr:last-child td{border-bottom:none}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle}
+</style>
+
+<h2 class="sr-only">AgroOS Super App — Master Plan & Vision Document</h2>
+
+<div class="hero">
+  <p class="hero-eyebrow">Master Architecture Plan · Version 1.0</p>
+  <h1 class="hero-title">AgroOS<br>Super App</h1>
+  <p class="hero-sub">The world's most complete farming intelligence platform — from seed to sale, soil to shelf, farm to finance.</p>
+  <div class="hero-badges">
+    <span class="badge badge-green">12 Core Modules</span>
+    <span class="badge badge-amber">4 Phase Roadmap</span>
+    <span class="badge badge-blue">Apple-level Design</span>
+    <span class="badge badge-green">AI-First Architecture</span>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showSection('modules')">All Modules</button>
+  <button class="nav-btn" onclick="showSection('uidemo')">UI Preview</button>
+  <button class="nav-btn" onclick="showSection('roadmap')">Roadmap</button>
+  <button class="nav-btn" onclick="showSection('architecture')">Architecture</button>
+  <button class="nav-btn" onclick="showSection('revenue')">Revenue Model</button>
+  <button class="nav-btn" onclick="showSection('metrics')">KPIs & Metrics</button>
+</nav>
+
+<!-- MODULES -->
+<div id="sec-modules" class="section active">
+  <div class="section-header">
+    <h2 class="section-title">12 Super App Modules</h2>
+    <p class="section-desc">Every dimension of farming life — deeply integrated, beautifully presented.</p>
+  </div>
+  <div class="modules-grid">
+    <div class="module-card featured" onclick="sendPrompt('Tell me more about the AgroOS Farm Intelligence module and its AI features')">
+      <span class="module-icon"><i class="ti ti-brain" aria-hidden="true"></i></span>
+      <div class="module-name">Farm Intelligence</div>
+      <div class="module-desc">AI crop advisor, soil analysis, pest detection, yield prediction. Offline-capable with edge AI.</div>
+      <div class="module-count">6 sub-features · Core module</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS Farming Techniques module')">
+      <span class="module-icon"><i class="ti ti-plant" aria-hidden="true"></i></span>
+      <div class="module-name">Farming Techniques</div>
+      <div class="module-desc">100+ crop guides, precision farming, hydroponics, organic, drip irrigation, polyculture methods.</div>
+      <div class="module-count">8 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS Farm Maintenance & Loggers module')">
+      <span class="module-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></span>
+      <div class="module-name">Maintenance & Loggers</div>
+      <div class="module-desc">Daily activity logs, equipment maintenance, irrigation schedules, field inspection checklists.</div>
+      <div class="module-count">7 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS Analytics & Reporting module')">
+      <span class="module-icon"><i class="ti ti-chart-line" aria-hidden="true"></i></span>
+      <div class="module-name">Analytics & Reports</div>
+      <div class="module-desc">Yield analytics, cost analysis, comparative benchmarks, satellite field view, seasonal trend charts.</div>
+      <div class="module-count">9 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS Production Planning module')">
+      <span class="module-icon"><i class="ti ti-tractor" aria-hidden="true"></i></span>
+      <div class="module-name">Production Planning</div>
+      <div class="module-desc">Crop calendar, resource allocation, labor planning, harvest scheduling, multi-season forecasting.</div>
+      <div class="module-count">6 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS Logistics & Supply Chain module')">
+      <span class="module-icon"><i class="ti ti-truck" aria-hidden="true"></i></span>
+      <div class="module-name">Logistics & Supply Chain</div>
+      <div class="module-desc">Buyer network, live market price tracking, cold storage management, transport booking, quality grading.</div>
+      <div class="module-count">8 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS Money & Finance module')">
+      <span class="module-icon"><i class="ti ti-coin" aria-hidden="true"></i></span>
+      <div class="module-name">Money & Finance</div>
+      <div class="module-desc">Farm P&L, government scheme finder, microloans, crop insurance, input credit, FPO billing.</div>
+      <div class="module-count">10 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS Weather & Climate module')">
+      <span class="module-icon"><i class="ti ti-cloud-rain" aria-hidden="true"></i></span>
+      <div class="module-name">Weather & Climate</div>
+      <div class="module-desc">Hyperlocal weather, rain alerts, frost warnings, crop-specific weather advisory, 14-day forecasts.</div>
+      <div class="module-count">5 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS Marketplace module')">
+      <span class="module-icon"><i class="ti ti-shopping-cart" aria-hidden="true"></i></span>
+      <div class="module-name">Agri Marketplace</div>
+      <div class="module-desc">Seeds, fertilizers, pesticides, equipment rentals, direct-to-buyer produce sales with escrow payments.</div>
+      <div class="module-count">7 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS Community & Guidance module')">
+      <span class="module-icon"><i class="ti ti-users" aria-hidden="true"></i></span>
+      <div class="module-name">Community & Guidance</div>
+      <div class="module-desc">Expert Q&A, farmer forums, video tutorials, krishi vigyan kendra directory, agri-extension linkage.</div>
+      <div class="module-count">6 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS News & Alerts module')">
+      <span class="module-icon"><i class="ti ti-news" aria-hidden="true"></i></span>
+      <div class="module-name">Agri News & Alerts</div>
+      <div class="module-desc">Real-time mandi prices, policy updates, pest outbreak alerts, export-import news, subsidy notifications.</div>
+      <div class="module-count">5 sub-features</div>
+    </div>
+    <div class="module-card" onclick="sendPrompt('Explain the AgroOS IoT & Smart Farm module')">
+      <span class="module-icon"><i class="ti ti-device-analytics" aria-hidden="true"></i></span>
+      <div class="module-name">IoT & Smart Farm</div>
+      <div class="module-desc">Sensor dashboards, drone integration, automated drip control, soil moisture alerts, smart greenhouse.</div>
+      <div class="module-count">8 sub-features</div>
+    </div>
+  </div>
+</div>
+
+<!-- UI DEMO -->
+<div id="sec-uidemo" class="section">
+  <div class="section-header">
+    <h2 class="section-title">UI Preview — Farm Dashboard</h2>
+    <p class="section-desc">Apple-inspired clarity. Every pixel earns its place. Designed for farmers on-field and on-desk.</p>
+  </div>
+  <div class="ui-preview">
+    <div class="ui-topbar">
+      <div class="ui-dots">
+        <div class="ui-dot" style="background:#ff5f57"></div>
+        <div class="ui-dot" style="background:#febc2e"></div>
+        <div class="ui-dot" style="background:#28c840"></div>
+      </div>
+      <span class="ui-title">AgroOS · Farm Command Center</span>
+    </div>
+    <div class="ui-body">
+      <div class="ui-sidebar">
+        <div class="ui-nav-item active"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+        <div class="ui-nav-item"><i class="ti ti-plant-2" aria-hidden="true"></i> My Crops</div>
+        <div class="ui-nav-item"><i class="ti ti-chart-bar" aria-hidden="true"></i> Analytics</div>
+        <div class="ui-nav-item"><i class="ti ti-truck" aria-hidden="true"></i> Logistics</div>
+        <div class="ui-nav-item"><i class="ti ti-coin" aria-hidden="true"></i> Finance</div>
+        <div class="ui-nav-item"><i class="ti ti-cloud-rain" aria-hidden="true"></i> Weather</div>
+        <div class="ui-nav-item"><i class="ti ti-shopping-cart" aria-hidden="true"></i> Market</div>
+        <div class="ui-nav-item"><i class="ti ti-news" aria-hidden="true"></i> News</div>
+        <div class="ui-nav-item"><i class="ti ti-device-analytics" aria-hidden="true"></i> IoT</div>
+        <div class="ui-nav-item"><i class="ti ti-users" aria-hidden="true"></i> Community</div>
+      </div>
+      <div class="ui-main">
+        <div class="ui-kpi-row">
+          <div class="ui-kpi">
+            <div class="ui-kpi-val">4.2T</div>
+            <div class="ui-kpi-lab">Est. yield</div>
+            <div class="ui-kpi-chg">↑ 12% vs last</div>
+          </div>
+          <div class="ui-kpi">
+            <div class="ui-kpi-val">₹2.1L</div>
+            <div class="ui-kpi-lab">Revenue (MTD)</div>
+            <div class="ui-kpi-chg">↑ 8%</div>
+          </div>
+          <div class="ui-kpi">
+            <div class="ui-kpi-val">Day 38</div>
+            <div class="ui-kpi-lab">Paddy cycle</div>
+            <div class="ui-kpi-chg">On track</div>
+          </div>
+        </div>
+        <div class="ui-chart-area">
+          <div class="ui-chart-label">Monthly yield (kg) · Current season</div>
+          <div class="chart-bars" id="chartbars"></div>
+        </div>
+        <div class="ui-alerts">
+          <div class="ui-alert">
+            <div class="ui-alert-title" style="color:var(--text-warning)">⚠ Low moisture</div>
+            <div class="ui-alert-body">Field B-3 · Act by Fri</div>
+          </div>
+          <div class="ui-alert">
+            <div class="ui-alert-title" style="color:var(--text-success)">✓ Mandi price up</div>
+            <div class="ui-alert-body">Paddy +₹42/qt today</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--text-muted);margin-top:.6rem">Design language: Spatial hierarchy, 8px grid, variable weight typography, contextual color — no decorative chrome.</p>
+</div>
+
+<!-- ROADMAP -->
+<div id="sec-roadmap" class="section">
+  <div class="section-header">
+    <h2 class="section-title">4-Phase Build Roadmap</h2>
+    <p class="section-desc">From MVP to full super app — structured for quality, not speed.</p>
+  </div>
+  <div class="roadmap">
+    <div class="phase">
+      <div class="phase-left">
+        <div class="phase-tag badge-green" style="background:var(--bg-success);color:var(--text-success);border-radius:6px;padding:4px 6px;font-size:10px;font-weight:500">Phase 1</div>
+        <div class="phase-duration" style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px">Months 1–4</div>
+      </div>
+      <div class="phase-content">
+        <h4>Foundation — Core Farm OS</h4>
+        <p>Design system, auth, multi-language (Tamil, Hindi, English), offline sync engine, AI crop advisor MVP, basic loggers, weather integration, farm profile setup.</p>
+        <div class="phase-pills">
+          <span class="phase-pill">Design System</span>
+          <span class="phase-pill">Auth & Profiles</span>
+          <span class="phase-pill">Crop Advisor AI</span>
+          <span class="phase-pill">Farm Loggers</span>
+          <span class="phase-pill">Weather</span>
+          <span class="phase-pill">Offline Mode</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-left">
+        <div class="phase-tag" style="background:var(--bg-accent);color:var(--text-accent);border-radius:6px;padding:4px 6px;font-size:10px;font-weight:500">Phase 2</div>
+        <div class="phase-duration" style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px">Months 5–9</div>
+      </div>
+      <div class="phase-content">
+        <h4>Commerce & Markets</h4>
+        <p>Live mandi price feeds, buyer-seller marketplace, logistics booking, supply chain tracking, farm P&L module, government scheme finder, basic IoT sensor dashboard.</p>
+        <div class="phase-pills">
+          <span class="phase-pill">Mandi Prices</span>
+          <span class="phase-pill">Marketplace</span>
+          <span class="phase-pill">Logistics</span>
+          <span class="phase-pill">Farm Finance</span>
+          <span class="phase-pill">Scheme Finder</span>
+          <span class="phase-pill">IoT MVP</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-left">
+        <div class="phase-tag" style="background:var(--bg-warning);color:var(--text-warning);border-radius:6px;padding:4px 6px;font-size:10px;font-weight:500">Phase 3</div>
+        <div class="phase-duration" style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px">Months 10–15</div>
+      </div>
+      <div class="phase-content">
+        <h4>Intelligence Layer</h4>
+        <p>Satellite field mapping, AI-powered analytics, yield forecasting models, community platform, expert network, deep IoT integration, drone data ingestion, precision farming tools.</p>
+        <div class="phase-pills">
+          <span class="phase-pill">Satellite Maps</span>
+          <span class="phase-pill">Yield Forecast</span>
+          <span class="phase-pill">Community</span>
+          <span class="phase-pill">Expert Network</span>
+          <span class="phase-pill">Drone Data</span>
+          <span class="phase-pill">Deep Analytics</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-left">
+        <div class="phase-tag" style="background:var(--bg-pro);color:var(--text-pro);border-radius:6px;padding:4px 6px;font-size:10px;font-weight:500">Phase 4</div>
+        <div class="phase-duration" style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px">Months 16–24</div>
+      </div>
+      <div class="phase-content">
+        <h4>Super App — Full Ecosystem</h4>
+        <p>FPO management tools, B2B procurement platform, export-import connections, microloan disbursement, crop insurance APIs, white-label for agri-banks & state govts, API marketplace.</p>
+        <div class="phase-pills">
+          <span class="phase-pill">FPO Tools</span>
+          <span class="phase-pill">B2B Platform</span>
+          <span class="phase-pill">Export/Import</span>
+          <span class="phase-pill">Microloans</span>
+          <span class="phase-pill">Insurance APIs</span>
+          <span class="phase-pill">White-label</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div id="sec-architecture" class="section">
+  <div class="section-header">
+    <h2 class="section-title">System Architecture</h2>
+    <p class="section-desc">Built for 10M+ concurrent farmers. Edge-first, offline-capable, multi-cloud resilient.</p>
+  </div>
+  <div class="arch-grid">
+    <div class="arch-card">
+      <h4><i class="ti ti-device-mobile" aria-hidden="true"></i> Frontend Layer</h4>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>React Native · iOS & Android</div>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>Next.js · Web dashboard</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>WatermelonDB · Offline sync</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>TanStack Query · Data cache</div>
+      <div class="arch-item"><div class="arch-dot dot-amber"></div>i18n · Tamil, Hindi, Telugu, more</div>
+    </div>
+    <div class="arch-card">
+      <h4><i class="ti ti-server" aria-hidden="true"></i> Backend Layer</h4>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>Node.js / Fastify · API gateway</div>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>Python / FastAPI · AI services</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>PostgreSQL + PostGIS · Farm data</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>Redis · Real-time & caching</div>
+      <div class="arch-item"><div class="arch-dot dot-amber"></div>Kafka · Event streaming</div>
+    </div>
+    <div class="arch-card">
+      <h4><i class="ti ti-brain" aria-hidden="true"></i> AI / ML Services</h4>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>LLM (Claude API) · Crop advisor</div>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>TensorFlow Lite · On-device AI</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>Computer Vision · Pest detection</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>Time-series models · Yield predict</div>
+      <div class="arch-item"><div class="arch-dot dot-amber"></div>Satellite imagery · NDVI analysis</div>
+    </div>
+    <div class="arch-card">
+      <h4><i class="ti ti-cloud" aria-hidden="true"></i> Infrastructure</h4>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>AWS · Primary cloud (ap-south-1)</div>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>Cloudflare · CDN & edge workers</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>S3 + CloudFront · Media & docs</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>EKS · Container orchestration</div>
+      <div class="arch-item"><div class="arch-dot dot-red"></div>SOC2 + ISO 27001 target</div>
+    </div>
+    <div class="arch-card">
+      <h4><i class="ti ti-plug" aria-hidden="true"></i> Key Integrations</h4>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>eNAM API · National mandi prices</div>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>IMD / Windy · Weather feeds</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>Sentinel-2 · Satellite imagery</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>UIDAI / DigiLocker · KYC</div>
+      <div class="arch-item"><div class="arch-dot dot-amber"></div>UPI / Razorpay · Payments</div>
+    </div>
+    <div class="arch-card">
+      <h4><i class="ti ti-shield-check" aria-hidden="true"></i> Data & Security</h4>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>End-to-end encryption · All PII</div>
+      <div class="arch-item"><div class="arch-dot dot-green"></div>PDPB 2023 compliance</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>Row-level security · Multi-tenant</div>
+      <div class="arch-item"><div class="arch-dot dot-blue"></div>Audit logs · All data writes</div>
+      <div class="arch-item"><div class="arch-dot dot-amber"></div>DPDP Act · Data localization</div>
+    </div>
+  </div>
+</div>
+
+<!-- REVENUE -->
+<div id="sec-revenue" class="section">
+  <div class="section-header">
+    <h2 class="section-title">Revenue Model</h2>
+    <p class="section-desc">7 diversified streams — built so farmers pay only if they earn more. Platform grows with farmer income.</p>
+  </div>
+  <div class="revenue-grid">
+    <div class="revenue-card">
+      <h4>SaaS Subscriptions</h4>
+      <div class="amount">₹0 / ₹499 / ₹1,499</div>
+      <div class="label" style="margin-bottom:.5rem">Free · Pro · Enterprise (per farm/yr)</div>
+      <div class="revenue-streams">
+        <div class="rev-stream"><span class="rev-name">Basic (free)</span><span class="rev-val">Market access</span></div>
+        <div class="rev-stream"><span class="rev-name">Pro farmer</span><span class="rev-val">AI + analytics</span></div>
+        <div class="rev-stream"><span class="rev-name">FPO / Agri-biz</span><span class="rev-val">White-label</span></div>
+      </div>
+    </div>
+    <div class="revenue-card">
+      <h4>Transaction Commissions</h4>
+      <div class="amount">0.5–2%</div>
+      <div class="label" style="margin-bottom:.5rem">Per trade / booking</div>
+      <div class="revenue-streams">
+        <div class="rev-stream"><span class="rev-name">Marketplace sales</span><span class="rev-val">1.5%</span></div>
+        <div class="rev-stream"><span class="rev-name">Input purchases</span><span class="rev-val">2%</span></div>
+        <div class="rev-stream"><span class="rev-name">Logistics booking</span><span class="rev-val">0.5%</span></div>
+      </div>
+    </div>
+    <div class="revenue-card">
+      <h4>Financial Services</h4>
+      <div class="amount">1–3% fee</div>
+      <div class="label" style="margin-bottom:.5rem">Loan facilitation</div>
+      <div class="revenue-streams">
+        <div class="rev-stream"><span class="rev-name">Microloan origination</span><span class="rev-val">3%</span></div>
+        <div class="rev-stream"><span class="rev-name">Insurance referral</span><span class="rev-val">₹200/policy</span></div>
+        <div class="rev-stream"><span class="rev-name">Credit score reports</span><span class="rev-val">₹99/report</span></div>
+      </div>
+    </div>
+    <div class="revenue-card">
+      <h4>Data & APIs</h4>
+      <div class="amount">B2B licensing</div>
+      <div class="label" style="margin-bottom:.5rem">Anonymized agri-intelligence</div>
+      <div class="revenue-streams">
+        <div class="rev-stream"><span class="rev-name">Agri-tech API access</span><span class="rev-val">₹2L+/yr</span></div>
+        <div class="rev-stream"><span class="rev-name">Yield forecast data</span><span class="rev-val">₹5L+/yr</span></div>
+        <div class="rev-stream"><span class="rev-name">Govt / state portals</span><span class="rev-val">Tender</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- METRICS -->
+<div id="sec-metrics" class="section">
+  <div class="section-header">
+    <h2 class="section-title">Success KPIs by Phase</h2>
+    <p class="section-desc">Metrics that matter — farmer income growth is the north star.</p>
+  </div>
+  <table class="metric-table">
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Phase 1 (Month 4)</th>
+        <th>Phase 2 (Month 9)</th>
+        <th>Phase 3 (Month 15)</th>
+        <th>Phase 4 (Month 24)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Registered farmers</td>
+        <td>5,000</td>
+        <td>50,000</td>
+        <td>3,00,000</td>
+        <td>10,00,000</td>
+      </tr>
+      <tr>
+        <td>DAU / MAU ratio</td>
+        <td>>15%</td>
+        <td>>25%</td>
+        <td>>35%</td>
+        <td>>45%</td>
+      </tr>
+      <tr>
+        <td>Avg income uplift</td>
+        <td>—</td>
+        <td>8–12%</td>
+        <td>18–22%</td>
+        <td>30%+</td>
+      </tr>
+      <tr>
+        <td>GMV (marketplace)</td>
+        <td>—</td>
+        <td>₹1 Cr</td>
+        <td>₹25 Cr</td>
+        <td>₹200 Cr</td>
+      </tr>
+      <tr>
+        <td>ARR (SaaS)</td>
+        <td>—</td>
+        <td>₹20 L</td>
+        <td>₹1.5 Cr</td>
+        <td>₹12 Cr</td>
+      </tr>
+      <tr>
+        <td>App store rating</td>
+        <td>4.2+</td>
+        <td>4.5+</td>
+        <td>4.6+</td>
+        <td>4.7+</td>
+      </tr>
+      <tr>
+        <td>AI query accuracy</td>
+        <td>80%</td>
+        <td>88%</td>
+        <td>93%</td>
+        <td>96%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Build chart bars
+const bars = [320,510,480,620,590,740,810];
+const colors = ['var(--bg-success)','var(--bg-success)','var(--bg-success)','var(--border-success)','var(--border-success)','var(--text-success)','var(--text-success)'];
+const container = document.getElementById('chartbars');
+if(container){
+  bars.forEach((v,i)=>{
+    const el = document.createElement('div');
+    el.className = 'chart-bar';
+    el.style.height = Math.round(v/810*88)+'px';
+    el.style.background = colors[i];
+    el.style.opacity = i===6?'1':'0.7';
+    container.appendChild(el);
+  });
+}
+</script>
