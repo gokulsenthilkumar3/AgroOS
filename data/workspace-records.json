@@ -1,6 +1,15 @@
 [
   {
     "module": "weather",
+    "title": "QA rain plan updated",
+    "detail": "Check rain window before irrigation.",
+    "status": "ACTIVE",
+    "organisationId": "org-hydrogrow",
+    "id": "bee466d3-6d53-421c-8815-bf1e8c1f8ba1",
+    "updatedAt": "2026-09-22T16:40:18.968Z"
+  },
+  {
+    "module": "weather",
     "title": "Monsoon spray window — Block A",
     "detail": "Inspect wind and rain risk before the 10:00 spray round.",
     "status": "COMPLETED",

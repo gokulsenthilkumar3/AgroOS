@@ -1,5 +1,6 @@
 import { weather } from "@/lib/data";
 import { CloudRain, Droplets, Eye, Thermometer, Wind } from "lucide-react";
+import { ModuleRecords } from "@/components/module-records";
 
 export default function WeatherPage() {
   const { current, location, forecast, advisories } = weather;
@@ -12,7 +13,7 @@ export default function WeatherPage() {
           <h1>Weather & Climate</h1>
           <p className="muted">Crop-specific advisories for {location}</p>
         </div>
-        <button className="button secondary">Set alerts</button>
+        <a className="button secondary" href="#weather-alerts">Set alerts</a>
       </header>
 
       {/* ── Current conditions hero ── */}
@@ -136,6 +137,7 @@ export default function WeatherPage() {
           ))}
         </div>
       </section>
+      <div id="weather-alerts"><ModuleRecords module="weather" name="Weather alert"/></div>
     </>
   );
 }

@@ -99,14 +99,14 @@ export function AppShell({
           </span>
         </Link>
 
-        <button className="workspace-switcher">
+        <Link className="workspace-switcher" href="/dashboard/farms" aria-label="Switch farm workspace">
           <span className="workspace-icon">GV</span>
           <span>
             <strong>Green Valley</strong>
             <small>Farm workspace</small>
           </span>
           <ChevronDown size={13} />
-        </button>
+        </Link>
 
         <nav aria-label="Primary navigation">
           {filteredNav.map((group) => (
@@ -156,16 +156,18 @@ export function AppShell({
               id="global-search"
               aria-label="Search AgroOS"
               placeholder="Search farms, crops, orders…"
+              readOnly
+              onFocus={(event) => { event.currentTarget.blur(); dispatchEvent(new Event("agroos:command")); }}
             />
             <kbd>⌘ K</kbd>
           </label>
 
           <div className="top-actions">
             <span className="environment-badge">Live workspace</span>
-            <button className="icon-button" aria-label="Notifications">
+            <Link className="icon-button" aria-label="Notifications" href="/dashboard/news">
               <Bell size={16} />
               <i />
-            </button>
+            </Link>
           </div>
         </header>
 

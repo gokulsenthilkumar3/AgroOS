@@ -1,5 +1,6 @@
 import { devices, telemetry } from "@/lib/data";
 import { Activity, AlertTriangle, CheckCircle, Cpu } from "lucide-react";
+import { ModuleRecords } from "@/components/module-records";
 
 export default function TelemetryPage() {
   const metrics = [
@@ -18,7 +19,7 @@ export default function TelemetryPage() {
           <h1>Telemetry Dashboard</h1>
           <p className="muted">Live sensor readings from all connected devices across your zones.</p>
         </div>
-        <button className="button secondary">Configure alerts</button>
+        <a className="button secondary" href="#telemetry-alerts">Configure alerts</a>
       </header>
 
       {/* Device status cards */}
@@ -128,6 +129,7 @@ export default function TelemetryPage() {
           </div>
         </div>
       </section>
+      <div id="telemetry-alerts"><ModuleRecords module="telemetry" name="Sensor alert"/></div>
     </>
   );
 }

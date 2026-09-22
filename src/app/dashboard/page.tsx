@@ -57,9 +57,9 @@ export default function DashboardPage() {
             Here's how <strong>{farm.name}</strong> is performing today across all systems.
           </p>
         </div>
-        <button className="button secondary" style={{ gap: 6, display: "flex", alignItems: "center" }}>
+        <a className="button secondary" href="/api/v1/export?type=dashboard" style={{ gap: 6, display: "flex", alignItems: "center" }}>
           <TrendingUp size={14} /> Export report
-        </button>
+        </a>
       </header>
 
       {/* ── KPI metrics ── */}

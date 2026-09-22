@@ -12,7 +12,7 @@ export default function FarmingPage() {
           <h1>Farming Engine</h1>
           <p className="muted">100+ technique guides, crop protocols, and best practices — offline ready.</p>
         </div>
-        <button className="button secondary">My saved guides</button>
+        <a className="button secondary" href="/dashboard/modules/techniques">My saved guides</a>
       </header>
 
       {/* Stats strip */}
@@ -77,9 +77,9 @@ export default function FarmingPage() {
               <span style={{ fontSize: 10, color: "var(--text-faint)" }}>
                 Crops: {t.crops.slice(0, 2).join(", ")}{t.crops.length > 2 ? ` +${t.crops.length - 2}` : ""}
               </span>
-              <button style={{ border: 0, background: "transparent", color: "var(--brand-600)", fontSize: 11, fontWeight: 750, cursor: "pointer" }}>
+              <a href="/dashboard/modules/techniques" style={{ border: 0, background: "transparent", color: "var(--brand-600)", fontSize: 11, fontWeight: 750, cursor: "pointer" }}>
                 Open guide →
-              </button>
+              </a>
             </footer>
           </article>
         ))}
